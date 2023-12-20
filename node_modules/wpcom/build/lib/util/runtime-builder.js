@@ -1,0 +1,59 @@
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _typeof2 = require('babel-runtime/helpers/typeof');
+
+var _typeof3 = _interopRequireDefault(_typeof2);
+
+exports.default = function (Class, list, buildPath) {
+  list.forEach(function (methodParams) {
+    methodParams = 'object' === (typeof methodParams === 'undefined' ? 'undefined' : (0, _typeof3.default)(methodParams)) ? methodParams : { name: methodParams };
+
+    debug('Adding %o', methodParams.name);
+    Class.prototype[methodParams.name] = methodBuilder(methodParams, buildPath);
+  });
+};
+
+var _debug = require('debug');
+
+var _debug2 = _interopRequireDefault(_debug);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Module vars
+ */
+var debug = (0, _debug2.default)('wpcom:runtime');
+
+/**
+ * Build a generic method
+ *
+ * @param {Object} methodParams - method methodParams
+ * @param {Function} buildPath - function called to build method path
+ * @return {String} method path
+ */
+/**
+ * Module dependencies
+ */
+var methodBuilder = function methodBuilder(methodParams, buildPath) {
+  return function (query, fn) {
+    var path = buildPath(methodParams, this);
+    return this.wpcom.req.get(path, query, fn);
+  };
+};
+
+/**
+ * Add methods to the given Class in the
+ * runtime process.
+ *
+ * @param {*} Class - class to extend
+ * @param {Array} list - methods list
+ * @param {Function} buildPath - function to build the method endpoint path
+ */
+;
+module.exports = exports['default'];
+
+//# sourceMappingURL=runtime-builder.js.map

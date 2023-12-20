@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../../lib/runtime/site.post.get.js"],"names":[],"mappings":";;;;;kBAAe,CACd,EAAE,MAAM,WAAR,EAAqB,SAAS,OAA9B,EADc,EAEd,EAAE,MAAM,iBAAR,EAA2B,SAAS,aAApC,EAFc,C","file":"site.post.get.js","sourcesContent":["export default [\n\t{ name: 'likesList', subpath: 'likes' },\n\t{ name: 'subscribersList', subpath: 'subscribers' }\n]\n"]}

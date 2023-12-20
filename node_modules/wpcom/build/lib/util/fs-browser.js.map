@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../../lib/util/fs-browser.js"],"names":[],"mappings":";;;;;QAAgB,gB,GAAA,gB;AAAT,SAAS,gBAAT,GAA4B;AAClC,OAAM,IAAI,KAAJ,CAAW,6CAAX,CAAN;AACA","file":"fs-browser.js","sourcesContent":["export function createReadStream() {\n\tthrow new Error( 'Cannot call fs functions within the browser' );\n}\n"]}

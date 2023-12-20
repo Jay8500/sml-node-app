@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../../lib/util/fs.js"],"names":[],"mappings":";;;;;QAKgB,gB,GAAA,gB;;AAFhB;;;;;;AAEO,SAAS,gBAAT,GAAqC;AAC3C,SAAO,aAAG,gBAAH,+BAAP;AACA,C,CAPD","file":"fs.js","sourcesContent":["/**\n * Module dependencies.\n */\nimport fs from 'fs';\n\nexport function createReadStream( ...args ) {\n\treturn fs.createReadStream( ...args );\n}\n"]}
