@@ -276,7 +276,7 @@ usableRoutes.post('/branchlist', async (req, res) => {
 
             texts['DATA'] = updatedbranchesList;
         } else {
-            let getBranches = await branch.find({}).sort({ create_dt: -1 }) //.sort({ bname: 1, cname: -1 });
+            let getBranches = await branch.find({}).sort({ bcode: -1 }) //.sort({ bname: 1, cname: -1 });
             texts['DATA'] = getBranches;
         };
         texts['S_CODE'] = 200;

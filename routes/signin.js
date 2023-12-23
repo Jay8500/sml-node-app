@@ -28,46 +28,38 @@ userSignin.post('/smlsignin', async (req, res) => {
             texts['S_MSG'] = "No Users Payload Submitted to Create";
             texts['DATA'] = [];
         } else {
-            if (createUserPayload.flag == 'S') { // CREATE
-                let isExists = false;
-                let { uname, password } = createUserPayload;
-                let findUserInDb = { uname: uname };
-                let isUserNameExists = await userModels.findOne(findUserInDb, 'uname password cader branchid branchname companyname gendername');
-                // let isUserNameExists = await userModels.findOne(findUserInDb);
-                if (isUserNameExists != null) {
-                    let { password: hashedPassword, cader } = isUserNameExists;
-                    let getCaders = await smlCaders.findById({ _id: cader });
-                    // let getCaders = await smlCaders.findById({ _id: isUserNameExists['cader'] });
+            if (createUserPayload.flag === 'S') {
+                const { uname, password } = createUserPayload;
+                const findUserInDb = { uname: uname };
+
+                const isUserNameExists = await userModels.findOne(findUserInDb, 'uname password cader branchid branchname companyname gendername');
+
+                if (isUserNameExists) {
+                    const { password: hashedPassword, cader } = isUserNameExists;
+                    const getCaders = await smlCaders.findById(cader);
+
                     if (await comparePasswords(password, hashedPassword)) {
-                        let secureToken = jwt.sign({ ...isUserNameExists }, 'LAKSHMI',
-                            {
-                                expiresIn: 5000
-                                // expiresIn: Math.floor(Date.now() / 1000) + 120
-                            }
-                        );
-                        texts['S_CODE'] = 200;
-                        texts['S_MSG'] = `User in Database`;
-                        let createUserInfo = Object.assign({}, isUserNameExists._doc);
-                        createUserInfo['secure'] = secureToken;
-                        createUserInfo['userCader'] = getCaders;
-                        createUserInfo['loggTime'] = Date.now();
-                        texts['DATA'] =
-                            [
-                                {
-                                    userInfo: createUserInfo
+                        const secureToken = jwt.sign({ ...isUserNameExists }, 'LAKSHMI', { expiresIn: 5000 });
+
+                        texts = {
+                            S_CODE: 200,
+                            S_MSG: `User in Database`,
+                            DATA: [{
+                                userInfo: {
+                                    ...isUserNameExists._doc,
+                                    secure: secureToken,
+                                    userCader: getCaders,
+                                    loggTime: Date.now()
                                 }
-                            ];
+                            }]
+                        };
                     } else {
-                        texts['S_CODE'] = 300;
-                        texts['S_MSG'] = `User Password is not matched with Database.`;
-                        texts['DATA'] = [];
-                    };
+                        texts = { S_CODE: 300, S_MSG: `User Password is not matched with Database.`, DATA: [] };
+                    }
                 } else {
-                    texts['S_CODE'] = 300;
-                    texts['S_MSG'] = `User does not exist in database.`;
-                    texts['DATA'] = [];
+                    texts = { S_CODE: 300, S_MSG: `User does not exist in database.`, DATA: [] };
                 }
-            };
+            }
         };
     } catch (e) {
         texts['S_CODE'] = 400;
