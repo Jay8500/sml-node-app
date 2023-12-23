@@ -374,7 +374,8 @@ usableRoutes.post('/departmentlist', async (req, res) => {
 usableRoutes.post('/gnloanslist', async (req, res) => {
     let texts = { S_CODE: null, S_MSG: "", };
     try {
-        let genLoansList = await generateLoans.find({}).sort({ create_dt: -1 });
+        let loandPaylod = cryptos.enableCrypto(req) ? cryptos.decrypt(req.body.secure) : req.body.secure;
+        let genLoansList = await generateLoans.find({ create_by: loandPaylod.create_by }).sort({ create_dt: -1 });
         texts['S_CODE'] = 200;
         texts['S_MSG'] = "SUCCESS";
         texts['DATA'] = genLoansList;
@@ -833,8 +834,8 @@ usableRoutes.post('/generateloans', async (req, res) => {
             texts['S_MSG'] = "No Payload Submitted to Create";
             texts['DATA'] = [];
         } else {
-            // let company = await branch.findOne({ _id: generateLoansPayload.branch_id });
-            // generateLoansPayload['branch_name'] = company.bname;
+            let company = await branch.findOne({ _id: generateLoansPayload.branch });
+            generateLoansPayload['branchname'] = company.bname;
 
             if (generateLoansPayload.flag == 'S') { // CREATE
                 delete generateLoansPayload.id;
@@ -847,6 +848,7 @@ usableRoutes.post('/generateloans', async (req, res) => {
                 let bEdit = await generateLoans.findOne({ _id: generateLoansPayload.id });
                 bEdit.smtcode = generateLoansPayload.smtcode;
                 bEdit.branch = generateLoansPayload.branch;
+                bEdit.branchname = generateLoansPayload.branchname;
                 bEdit.borrowername = generateLoansPayload.borrowername;
                 bEdit.borrower = generateLoansPayload.borrower;
                 bEdit.housetype = generateLoansPayload.housetype;
@@ -866,8 +868,9 @@ usableRoutes.post('/generateloans', async (req, res) => {
                 bEdit.approvalstatus = generateLoansPayload.approvalstatus;
                 bEdit.approvalremarks = generateLoansPayload.approvalremarks;
                 bEdit.approvalby = generateLoansPayload.approvalby;
+                bEdit.description = generateLoansPayload.description;
 
-                await generateLoans.save();
+                await bEdit.save();
                 texts['S_CODE'] = 200;
                 texts['S_MSG'] = `SUCCESS`;
                 texts['DATA'] = [];

@@ -515,6 +515,9 @@ const genrteLoanSchema = new Schema({
         type: String,
         require: true,
     },
+    branchname: {
+        type: String
+    },
     borrowerid: {
         type: String,
         require: true,
