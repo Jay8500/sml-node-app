@@ -1,7 +1,8 @@
 const express = require('express');
 const usableRoutes = express.Router();
 const { titles, genders, branch, compans, addressMaster, departments, units,
-    clientInfos, createteams, CountryModel, generateLoans, permissionss } = require('../dbmodels/usables');
+    clientInfos, createteams, CountryModel, generateLoans, permissionss
+    , loanApprovalsPermissiones } = require('../dbmodels/usables');
 const cryptos = require('../utilities/cryptos');
 const userModels = require('../dbmodels/users');
 const mongoose = require('mongoose');
@@ -719,6 +720,71 @@ usableRoutes.post('/create-borrower', async (req, res) => {
     }
     res.json(cryptos.enableCrypto(req) ? cryptos.encrypt(JSON.stringify(texts)) : texts);
 });
+
+usableRoutes.post('/loanApprovalsPermissiones', async (req, res) => {
+    let texts = { S_CODE: null, S_MSG: "", }
+    try {
+        let clientInfosPayload = cryptos.enableCrypto(req) ? cryptos.decrypt(req.body.secure) : req.body.secure;//cryptos.decrypt(req.body.secure);
+        if (Object.keys(clientInfosPayload).length == 0) {
+            texts['S_CODE'] = 400;
+            texts['S_MSG'] = "No Payload Submitted to Create";
+            texts['DATA'] = [];
+        } else {
+            // let company = await branch.findOne({ _id: clientInfosPayload.branch_id });
+            // clientInfosPayload['branch_name'] = company.bname;
+
+            if (clientInfosPayload.flag == 'S') { // CREATE
+                delete clientInfosPayload.id;
+                let createBorrower = await clientInfos.create(clientInfosPayload);
+                await createBorrower.save();
+                texts['S_CODE'] = 200;
+                texts['S_MSG'] = `SUCCESS`;
+                texts['DATA'] = [];
+            } else if (clientInfosPayload.flag == 'E') {
+                let bEdit = await clientInfos.findOne({ _id: clientInfosPayload.id });
+                bEdit.name = clientInfosPayload.name;
+                bEdit.aadhar = clientInfosPayload.aadhar;
+                bEdit.ccode = clientInfosPayload.ccode;
+                bEdit.contact_no = clientInfosPayload.contact_no;
+                bEdit.description = clientInfosPayload.description;
+                bEdit.branch_id = clientInfosPayload.branch_id;
+                bEdit.branch_name = clientInfosPayload.branch_name;
+
+                bEdit.pincode = clientInfosPayload.pincode;
+                bEdit.byemployee = clientInfosPayload.byemployee;
+                bEdit.byemployeename = clientInfosPayload.byemployeename;
+                bEdit.active = clientInfosPayload.active;
+
+                bEdit.A = clientInfosPayload.A;
+                bEdit.RC = clientInfosPayload.RC;
+                bEdit.HTR = clientInfosPayload.HTR;
+                bEdit.LA = clientInfosPayload.LA;
+                bEdit.HP = clientInfosPayload.HP;
+                bEdit.PPC = clientInfosPayload.PPC;
+                bEdit.OTHERS = clientInfosPayload.OTHERS;
+
+                bEdit.countryname = clientInfosPayload.countryname;
+                bEdit.state = clientInfosPayload.state;
+                bEdit.cityname = clientInfosPayload.cityname;
+                bEdit.city = clientInfosPayload.city;
+
+                await bEdit.save();
+                texts['S_CODE'] = 200;
+                texts['S_MSG'] = `SUCCESS`;
+                texts['DATA'] = [];
+            };
+            texts['S_CODE'] = 200;
+            texts['S_MSG'] = `${clientInfosPayload.flag == 'E' ? 'Edited' : 'Created'} a Borrower Successfully`;
+            texts['DATA'] = [];
+        };
+    } catch (e) {
+        // console.log(e)
+        texts['S_CODE'] = 400;
+        texts['S_MSG'] = "SERVER ERROR";
+        texts['DATA'] = [];
+    }
+    res.json(cryptos.enableCrypto(req) ? cryptos.encrypt(JSON.stringify(texts)) : texts);
+});
 // borrower end
 
 
@@ -834,8 +900,10 @@ usableRoutes.post('/generateloans', async (req, res) => {
             texts['S_MSG'] = "No Payload Submitted to Create";
             texts['DATA'] = [];
         } else {
-            let company = await branch.findOne({ _id: generateLoansPayload.branch });
-            generateLoansPayload['branchname'] = company.bname;
+            if (['S', 'E'].includes(generateLoansPayload.flag)) {
+                let company = await branch.findOne({ _id: generateLoansPayload.branch });
+                generateLoansPayload['branchname'] = company.bname;
+            };
 
             if (generateLoansPayload.flag == 'S') { // CREATE
                 delete generateLoansPayload.id;
@@ -869,14 +937,40 @@ usableRoutes.post('/generateloans', async (req, res) => {
                 bEdit.approvalremarks = generateLoansPayload.approvalremarks;
                 bEdit.approvalby = generateLoansPayload.approvalby;
                 bEdit.description = generateLoansPayload.description;
-
                 await bEdit.save();
                 texts['S_CODE'] = 200;
                 texts['S_MSG'] = `SUCCESS`;
                 texts['DATA'] = [];
-            };
+            } else if (generateLoansPayload.flag == 'ST') {
+                let bEdit = await generateLoans.findOne({ _id: generateLoansPayload.id });
+                bEdit.approvalstatus = generateLoansPayload.approvalstatus;
+                bEdit.approvalremarks = generateLoansPayload.approvalremarks;
+                bEdit.approvalby = generateLoansPayload.create_by;
+                await bEdit.save();
+                texts['S_CODE'] = 200;
+                texts['S_MSG'] = `SUCCESS`;
+                texts['DATA'] = [];
+            } else if (generateLoansPayload.flag == 'DISBURSEMENT') {
+                let bEdit = await generateLoans.findOne({ _id: generateLoansPayload.id });
+                bEdit.paymenttype = generateLoansPayload.paymenttype;
+                bEdit.disbursementstatus = generateLoansPayload.disbursementstatus;
+                bEdit.disbursementstatusremarks = generateLoansPayload.disbursementstatusremarks;
+                await bEdit.save();
+                texts['S_CODE'] = 200;
+                texts['S_MSG'] = `SUCCESS`;
+                texts['DATA'] = [];
+            }
             texts['S_CODE'] = 200;
-            texts['S_MSG'] = `${generateLoansPayload.flag == 'E' ? 'Edited' : 'Created'} a loan  for ${generateLoansPayload.borrower} Successfully`;
+            if (generateLoansPayload.flag == 'E') {
+                texts['S_MSG'] = `Edited a loan  for ${generateLoansPayload.borrower} Successfully`
+            } else if (generateLoansPayload.flag == 'S') {
+                texts['S_MSG'] = `Created a loan  for ${generateLoansPayload.borrower} Successfully`
+            } else if (generateLoansPayload.flag == 'DISBURSEMENT') {
+                texts['S_MSG'] = `Disbursed a loan  for ${generateLoansPayload.borrower} Successfully`
+            } else {
+                texts['S_MSG'] = `Approved a loan  for ${generateLoansPayload.borrower} Successfully`
+            }
+            // = `${generateLoansPayload.flag == 'E' ? 'Edited' : 'Created'} ;
             texts['DATA'] = [];
         };
     } catch (e) {

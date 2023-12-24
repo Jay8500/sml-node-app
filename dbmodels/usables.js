@@ -598,6 +598,16 @@ const genrteLoanSchema = new Schema({
     },
     active: {
         type: Boolean
+    },
+    paymenttype: {
+        type: String
+    },
+    disbursementstatus: {
+        type: String,
+        default: 'N'
+    },
+    disbursementstatusremarks: {
+        type: String
     }
 });
 
@@ -618,6 +628,14 @@ const permissionsSchema = new Schema({
     modules: [pageModules]
 });
 
+const loanApprovalsPermission = new Schema({
+    userId: String,
+    username: String,
+    isCanDo: { type: String, default: 'N' },
+    name: String,
+    path: String
+});
+
 const titles = model('title', titleSchema);
 const genders = model('gender', genderSchema);
 const branch = model('smlbranch', branchSchemaNew);
@@ -632,6 +650,7 @@ const createteams = model('createteam', createteam);
 const CountryModel = model('addressdata', countrySchema, 'addressdata');
 const generateLoans = model('generateloan', genrteLoanSchema, 'generateloan');
 const permissions = model('permissions', permissionsSchema, 'permissions');
+const loanApprovalsPermissiones = model('loanApprovalsPermission', loanApprovalsPermission, 'loanApprovalsPermission');
 
 module.exports.CountryModel = CountryModel;
 module.exports.titles = titles;
@@ -647,3 +666,4 @@ module.exports.pps = pps;
 module.exports.createteams = createteams;
 module.exports.generateLoans = generateLoans;
 module.exports.permissionss = permissions;
+module.exports.loanApprovalsPermissiones = loanApprovalsPermissiones;
