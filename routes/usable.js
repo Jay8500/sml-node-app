@@ -11,7 +11,7 @@ const approot = require('app-root-path');
 let upload = 'fileupload';
 const _ = require('lodash');
 const bodyParser = require('body-parser');
-const jsonpsrder = bodyParser.json({limit:'100kb'})
+const jsonpsrder = bodyParser.json({ limit: '100kb' })
 const uploaddir = `${approot}/${upload}`;
 if (!fs.existsSync(uploaddir)) {
     fs.mkdirSync(uploaddir);
@@ -650,13 +650,13 @@ usableRoutes.post('/borrowerlist', async (req, res) => {
                             OTHERS: getUsers.OTHERS
                         };
                         // let path
-                        
+
                         if (getUsers['A']) {
                             console.log(getUsers['A'], 'kgg')
                             let as = getUsers['A'].split('fileupload/')[1];
                             if (fs.existsSync(getUsers['A'])) {
                                 const uploaddir = `${approot}/${upload}`;
-                               console.log(getUsers['A'],'uhukbibi')
+                                console.log(getUsers['A'], 'uhukbibi')
                                 let url = _.replace(getUsers['A'], uploaddir, 'http://localhost:2300');
                                 console.log(url, 'setfile')
                                 getUsers['url'] = url;
@@ -666,14 +666,14 @@ usableRoutes.post('/borrowerlist', async (req, res) => {
                         //     console.log(getUsers['A'], 'kgg');
                         //     const uploaddir = `${approot}/${upload}`;
                         //     const filename = getUsers['A'].split('fileupload/')[1];
-                        
+
                         //     if (fs.existsSync(getUsers['A'])) {
                         //         let url = `http://localhost:2300/sml/sml-node-app-main/fileupload/${filename}`;
                         //         console.log(url, 'setfile');
                         //         getUsers['A'] = url;
                         //     }
                         // }
-                        
+
 
                         clientJoiningData.push(createP);
                     });
@@ -691,7 +691,7 @@ usableRoutes.post('/borrowerlist', async (req, res) => {
     res.json(cryptos.enableCrypto(req) ? cryptos.encrypt(JSON.stringify(texts)) : texts);
 });
 
-usableRoutes.post('/create-borrower',jsonpsrder, async (req, res) => {
+usableRoutes.post('/create-borrower', jsonpsrder, async (req, res) => {
     let texts = { S_CODE: null, S_MSG: "", }
     try {
         let clientInfosPayload = cryptos.enableCrypto(req) ? cryptos.decrypt(req.body.secure) : req.body.secure;//cryptos.decrypt(req.body.secure);
@@ -702,14 +702,14 @@ usableRoutes.post('/create-borrower',jsonpsrder, async (req, res) => {
         } else {
             // let company = await branch.findOne({ _id: clientInfosPayload.branch_id });
             // clientInfosPayload['branch_name'] = company.bname;
-    console.log(clientInfosPayload['A']['name'])
-                const clientInfoA = clientInfosPayload['A']['name'];
-                const timestamp = Date.now();
-                const fileName = clientInfoA;
-                const newpath = `${uploaddir}/${timestamp}-${fileName}`;
-                fs.writeFileSync(newpath, clientInfoA);
-                clientInfosPayload.A = null;
-                clientInfosPayload.A = newpath;
+            // console.log(clientInfosPayload['A']['name'])
+            // const clientInfoA = clientInfosPayload['A']['name'];
+            // const timestamp = Date.now();
+            // const fileName = clientInfoA;
+            // const newpath = `${uploaddir}/${timestamp}-${fileName}`;
+            // fs.writeFileSync(newpath, clientInfoA);
+            // clientInfosPayload.A = null;
+            // clientInfosPayload.A = newpath;
 
             //  clientInfosPayload.RC = clientInfosPayload.A['file_folder'] =newpath
             // clientInfosPayload.HTR = clientInfosPayload.A['file_folder']
