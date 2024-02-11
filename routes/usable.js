@@ -2,7 +2,7 @@ const express = require('express');
 const usableRoutes = express.Router();
 const { titles, genders, branch, compans, addressMaster, departments, units,
     clientInfos, createteams, CountryModel, generateLoans, permissionss
-    , loanApprovalsPermissiones } = require('../dbmodels/usables');
+    , loanApprovalsPermissiones, paymentsTables } = require('../dbmodels/usables');
 const cryptos = require('../utilities/cryptos');
 const userModels = require('../dbmodels/users');
 const mongoose = require('mongoose');
@@ -602,7 +602,7 @@ usableRoutes.post('/getOnlyCreatedBorrowers', async (req, res) => {
         texts['S_MSG'] = "SUCCESS";
         texts['DATA'] = isUserNameExists;
     } catch (e) {
-        console.log(e)
+        // console.log(e)
         texts['S_CODE'] = 400;
         texts['S_MSG'] = "SERVER ERROR";
         texts['DATA'] = [];
@@ -651,17 +651,17 @@ usableRoutes.post('/borrowerlist', async (req, res) => {
                         };
                         // let path
 
-                        if (getUsers['A']) {
-                            console.log(getUsers['A'], 'kgg')
-                            let as = getUsers['A'].split('fileupload/')[1];
-                            if (fs.existsSync(getUsers['A'])) {
-                                const uploaddir = `${approot}/${upload}`;
-                                console.log(getUsers['A'], 'uhukbibi')
-                                let url = _.replace(getUsers['A'], uploaddir, 'http://localhost:2300');
-                                console.log(url, 'setfile')
-                                getUsers['url'] = url;
-                            };
-                        };
+                        // if (getUsers['A']) {
+                        //     // console.log(getUsers['A'], 'kgg')
+                        //     let as = getUsers['A'].split('fileupload/')[1];
+                        //     if (fs.existsSync(getUsers['A'])) {
+                        //         const uploaddir = `${approot}/${upload}`;
+                        //         console.log(getUsers['A'], 'uhukbibi')
+                        //         let url = _.replace(getUsers['A'], uploaddir, 'http://localhost:2300');
+                        //         console.log(url, 'setfile')
+                        //         getUsers['url'] = url;
+                        //     };
+                        // };
                         // if (getUsers['A']) {
                         //     console.log(getUsers['A'], 'kgg');
                         //     const uploaddir = `${approot}/${upload}`;
@@ -1025,11 +1025,55 @@ usableRoutes.post('/generateloans', async (req, res) => {
             texts['DATA'] = [];
         };
     } catch (e) {
-        console.log(e)
+        // console.log(e)
         texts['S_CODE'] = 400;
         texts['S_MSG'] = "SERVER ERROR";
         texts['DATA'] = [];
     }
+    res.json(cryptos.enableCrypto(req) ? cryptos.encrypt(JSON.stringify(texts)) : texts);
+});
+
+
+usableRoutes.post('/payment', async (req, res) => {
+    let texts = { S_CODE: null, S_MSG: "", }
+    try {
+        let payments = cryptos.enableCrypto(req) ? cryptos.decrypt(req.body.secure) : req.body.secure;//cryptos.decrypt(req.body.secure);
+        if (Object.keys(payments).length == 0) {
+            texts['S_CODE'] = 400;
+            texts['S_MSG'] = "No Payload Submitted to Create";
+            texts['DATA'] = [];
+        } else {
+
+            if (payments.flag == 'S') { // CREATE
+                let createGenders = await paymentsTables.create(payments);
+                await createGenders.save();
+                texts['S_CODE'] = 200;
+                texts['S_MSG'] = `Payment SUCCESS`;
+                texts['DATA'] = [];
+            } else if (payments.flag == 'E') {
+
+            }
+        };
+    } catch (e) {
+        texts['S_CODE'] = 400;
+        texts['S_MSG'] = "SERVER ERROR";
+        texts['DATA'] = [];
+    }
+    res.json(cryptos.enableCrypto(req) ? cryptos.encrypt(JSON.stringify(texts)) : texts);
+});
+
+usableRoutes.post('/historypayments', async (req, res) => {
+    let texts = { S_CODE: null, S_MSG: "", };
+    try {
+        let historypayments = await paymentsTables.find({ smtcode: req.body.secure['smtcode'] });
+        texts['S_CODE'] = 200;
+        texts['S_MSG'] = "SUCCESS";
+        texts['DATA'] = historypayments;
+    } catch (e) {
+        texts['S_CODE'] = 400;
+        texts['S_MSG'] = "SERVER ERROR";
+        texts['DATA'] = [];
+    };
     res.json(cryptos.enableCrypto(req) ? cryptos.encrypt(JSON.stringify(texts)) : texts);
 });
 

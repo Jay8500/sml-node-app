@@ -636,6 +636,21 @@ const loanApprovalsPermission = new Schema({
     path: String
 });
 
+const paymentsTable = new Schema({
+    loanid: String,
+    smtcode: String,
+    borrwedamount: String,
+    totaldue: String,
+    collectedAmount: String,
+    paymenttype: String,
+    remarks: String,
+    paymentcnt: {
+        type: String,
+        default: 0
+    },
+    ...sameFields
+})
+
 const titles = model('title', titleSchema);
 const genders = model('gender', genderSchema);
 const branch = model('smlbranch', branchSchemaNew);
@@ -651,6 +666,7 @@ const CountryModel = model('addressdata', countrySchema, 'addressdata');
 const generateLoans = model('generateloan', genrteLoanSchema, 'generateloan');
 const permissions = model('permissions', permissionsSchema, 'permissions');
 const loanApprovalsPermissiones = model('loanApprovalsPermission', loanApprovalsPermission, 'loanApprovalsPermission');
+const paymentsTables = model('paymentsTable', paymentsTable, 'paymentsTable');
 
 module.exports.CountryModel = CountryModel;
 module.exports.titles = titles;
@@ -667,3 +683,4 @@ module.exports.createteams = createteams;
 module.exports.generateLoans = generateLoans;
 module.exports.permissionss = permissions;
 module.exports.loanApprovalsPermissiones = loanApprovalsPermissiones;
+module.exports.paymentsTables = paymentsTables;

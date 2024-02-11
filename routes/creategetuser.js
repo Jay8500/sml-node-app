@@ -94,7 +94,7 @@ usersRoute.post('/smlGetUsers', async (req, res) => {
                 // fil.create_by == createUserPayload['create_by']);
 
                 filteredGet.forEach(async (getUsers, userIn) => {
-                    console.log(getUsers)
+                    // console.log(getUsers)
                     let createP = {
                         id: getUsers._id,
                         uname: getUsers.uname,
