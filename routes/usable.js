@@ -1061,9 +1061,12 @@ usableRoutes.post('/payment', async (req, res) => {
                             res.forEach(ele => totalPayments += parseInt(ele['collectedAmount']))
                         }
                     });
-                    updateDueAmount.paymentcnt = await paymentsTables.find({ smtcode: payments.smtcode }).countDocuments() || 0;
-                    if(totalPayments === getActualLoanAmount ) updateDueAmount.paymentcnt = 0;
-                    updateDueAmount.dueamount = getActualLoanAmount - totalPayments;
+                    updateDueAmount.paymentcnt = await paymentsTables.find({ smtcode: payments.smtcode }).countDocuments();
+                    updateDueAmount.showhistory = await paymentsTables.find({ smtcode: payments.smtcode }).countDocuments() > 0 ? true : false;
+
+                    //  if (totalPayments === getActualLoanAmount) updateDueAmount.paymentcnt = -1;
+                    updateDueAmount.dueamount = getActualLoanAmount == totalPayments ? 0 : getActualLoanAmount - totalPayments;
+                    updateDueAmount.hide = getActualLoanAmount == totalPayments ? false : true
                     updateDueAmount.save();
                     texts['S_CODE'] = 200;
                     texts['S_MSG'] = `Payment SUCCESS`;
@@ -1085,7 +1088,7 @@ usableRoutes.post('/payment', async (req, res) => {
 usableRoutes.post('/historypayments', async (req, res) => {
     let texts = { S_CODE: null, S_MSG: "", };
     try {
-        let historypayments = await paymentsTables.find({ smtcode: req.body.secure['smtcode'] });
+        let historypayments = await paymentsTables.find({ smtcode: req.body.secure['smtcode'], loanid: req.body.secure['loanid'] });
         texts['S_CODE'] = 200;
         texts['S_MSG'] = "SUCCESS";
         texts['DATA'] = historypayments;

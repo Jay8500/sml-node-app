@@ -615,6 +615,14 @@ const genrteLoanSchema = new Schema({
     },
     dueamount: {
         type: String
+    },
+    hide: {
+        type: Boolean,
+        default: true
+    },
+    showhistory: {
+        type: Boolean,
+        default: false
     }
 });
 
