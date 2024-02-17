@@ -1047,9 +1047,28 @@ usableRoutes.post('/payment', async (req, res) => {
             if (payments.flag == 'S') { // CREATE
                 let createGenders = await paymentsTables.create(payments);
                 await createGenders.save();
-                texts['S_CODE'] = 200;
-                texts['S_MSG'] = `Payment SUCCESS`;
-                texts['DATA'] = [];
+                let updateDueAmount = await generateLoans.findOne({ smtcode: payments.smtcode });
+                let getActualLoanAmount = parseInt(updateDueAmount.loanamount);
+
+                if (parseInt(payments['collectedAmount']) > getActualLoanAmount) {
+                    texts['S_CODE'] = 204;
+                    texts['S_MSG'] = `Collected amount exceeds Borrowed amount`;
+                    texts['DATA'] = [];
+                } else {
+                    let totalPayments = 0;
+                    await paymentsTables.find({ smtcode: payments.smtcode }).then(res => {
+                        if (res.length > 0) {
+                            res.forEach(ele => totalPayments += parseInt(ele['collectedAmount']))
+                        }
+                    });
+                    updateDueAmount.paymentcnt = await paymentsTables.find({ smtcode: payments.smtcode }).countDocuments() || 0;
+                    updateDueAmount.dueamount = getActualLoanAmount - totalPayments;
+                    updateDueAmount.save();
+                    texts['S_CODE'] = 200;
+                    texts['S_MSG'] = `Payment SUCCESS`;
+                    texts['DATA'] = [];
+                };
+
             } else if (payments.flag == 'E') {
 
             }

@@ -608,6 +608,13 @@ const genrteLoanSchema = new Schema({
     },
     disbursementstatusremarks: {
         type: String
+    },
+    paymentcnt: {
+        type: Number,
+        default: 0
+    },
+    dueamount: {
+        type: String
     }
 });
 
