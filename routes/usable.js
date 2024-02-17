@@ -1062,6 +1062,7 @@ usableRoutes.post('/payment', async (req, res) => {
                         }
                     });
                     updateDueAmount.paymentcnt = await paymentsTables.find({ smtcode: payments.smtcode }).countDocuments() || 0;
+                    if(totalPayments === getActualLoanAmount ) updateDueAmount.paymentcnt = 0;
                     updateDueAmount.dueamount = getActualLoanAmount - totalPayments;
                     updateDueAmount.save();
                     texts['S_CODE'] = 200;
