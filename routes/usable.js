@@ -385,7 +385,7 @@ usableRoutes.post('/gnloanslist', async (req, res) => {
     let texts = { S_CODE: null, S_MSG: "", };
     try {
         let loandPaylod = cryptos.enableCrypto(req) ? cryptos.decrypt(req.body.secure) : req.body.secure;
-        let genLoansList = await generateLoans.find({ create_by: loandPaylod.create_by }).sort({ create_dt: -1 });
+        let genLoansList = await generateLoans.find({}).sort({ create_dt: -1 });
         texts['S_CODE'] = 200;
         texts['S_MSG'] = "SUCCESS";
         texts['DATA'] = genLoansList;
