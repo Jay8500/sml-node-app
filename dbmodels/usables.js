@@ -13,7 +13,7 @@ const sameFields = {
     },
     create_dt: {
         type: Date,
-        default: Date.now(),
+        default: new Date(),
     },
     modify_by: {
         type: String,
@@ -21,9 +21,35 @@ const sameFields = {
     },
     modify_dt: {
         type: Date,
-        default: Date.now()
+        default: new Date()
     }
 };
+
+const productsTable = new Schema({
+    pid: {
+        type: String,
+        require: true,
+    },
+    category: {
+        type: String,
+    },
+    product: {
+        type: String,
+    },
+    suritystatus: {
+        type: String,
+    },
+    tenure: {
+        type: String,
+    },
+    roi: {
+        type: String,
+    },
+    repayment: {
+        type: String,
+    },
+    ...sameFields
+});
 
 const titleSchema = new Schema({
     name: {
@@ -623,6 +649,10 @@ const genrteLoanSchema = new Schema({
     showhistory: {
         type: Boolean,
         default: false
+    },
+    repaymenttype: {
+        type: String,
+        default: 1
     }
 });
 
@@ -682,6 +712,7 @@ const generateLoans = model('generateloan', genrteLoanSchema, 'generateloan');
 const permissions = model('permissions', permissionsSchema, 'permissions');
 const loanApprovalsPermissiones = model('loanApprovalsPermission', loanApprovalsPermission, 'loanApprovalsPermission');
 const paymentsTables = model('paymentsTable', paymentsTable, 'paymentsTable');
+const productsTableDatas = model('productsTable', productsTable, 'productsTable');
 
 module.exports.CountryModel = CountryModel;
 module.exports.titles = titles;
@@ -699,3 +730,4 @@ module.exports.generateLoans = generateLoans;
 module.exports.permissionss = permissions;
 module.exports.loanApprovalsPermissiones = loanApprovalsPermissiones;
 module.exports.paymentsTables = paymentsTables;
+module.exports.productsTableDatas = productsTableDatas;

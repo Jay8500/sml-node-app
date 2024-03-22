@@ -2,7 +2,7 @@ const express = require('express');
 const usableRoutes = express.Router();
 const { titles, genders, branch, compans, addressMaster, departments, units,
     clientInfos, createteams, CountryModel, generateLoans, permissionss
-    , loanApprovalsPermissiones, paymentsTables } = require('../dbmodels/usables');
+    , loanApprovalsPermissiones, paymentsTables, productsTableDatas } = require('../dbmodels/usables');
 const cryptos = require('../utilities/cryptos');
 const userModels = require('../dbmodels/users');
 const mongoose = require('mongoose');
@@ -764,7 +764,7 @@ usableRoutes.post('/create-borrower', jsonpsrder, async (req, res) => {
             texts['DATA'] = [];
         };
     } catch (e) {
-        console.log(e)
+        // console.log(e)
         texts['S_CODE'] = 400;
         texts['S_MSG'] = "SERVER ERROR";
         texts['DATA'] = [];
@@ -1084,6 +1084,65 @@ usableRoutes.post('/payment', async (req, res) => {
     }
     res.json(cryptos.enableCrypto(req) ? cryptos.encrypt(JSON.stringify(texts)) : texts);
 });
+
+usableRoutes.post('/producsts-save', async (req, res) => {
+    let texts = { S_CODE: null, S_MSG: "", }
+    try {
+        let createProducts = cryptos.enableCrypto(req) ? cryptos.decrypt(req.body.secure) : req.body.secure;//cryptos.decrypt(req.body.secure);
+        if (Object.keys(createProducts).length == 0) {
+            texts['S_CODE'] = 400;
+            texts['S_MSG'] = "No Payload Submitted to Create";
+            texts['DATA'] = [];
+        } else {
+
+            if (createProducts.flag == 'S') { // CREATE
+                delete createProducts._id;
+                let createProduct = await productsTableDatas.create(createProducts);
+                await createProduct.save();
+
+            } else if (createProducts.flag == 'E') {
+
+                let editProdct = await productsTableDatas.findOne({ _id: createProducts._id });
+
+                editProdct.pid = createProducts.pid;
+                editProdct.category = createProducts.category;
+                editProdct.product = createProducts.product;
+                editProdct.suritystatus = createProducts.suritystatus;
+                editProdct.tenure = createProducts.tenure;
+                editProdct.roi = createProducts.roi;
+                editProdct.repayment = createProducts.repayment;
+                editProdct.active = createProducts.active;
+                await editProdct.save();
+
+            };
+            texts['S_CODE'] = 200;
+            texts['S_MSG'] = "Success";
+            texts['DATA'] = [];
+        };
+    } catch (e) {
+        texts['S_CODE'] = 400;
+        texts['S_MSG'] = "SERVER ERROR";
+        texts['DATA'] = [];
+    }
+    res.json(cryptos.enableCrypto(req) ? cryptos.encrypt(JSON.stringify(texts)) : texts);
+});
+
+usableRoutes.post('/getproducsts', async (req, res) => {
+    let texts = { S_CODE: null, S_MSG: "", }
+    try {
+        let getAllProducts = await productsTableDatas.find({ active: true });
+        texts['S_CODE'] = 200;
+        texts['S_MSG'] = "SUCCESS";
+        texts['DATA'] = getAllProducts;
+    } catch (e) {
+        texts['S_CODE'] = 400;
+        texts['S_MSG'] = "SERVER ERROR";
+        texts['DATA'] = [];
+    }
+    res.json(cryptos.enableCrypto(req) ? cryptos.encrypt(JSON.stringify(texts)) : texts);
+});
+
+
 
 usableRoutes.post('/historypayments', async (req, res) => {
     let texts = { S_CODE: null, S_MSG: "", };
