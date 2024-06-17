@@ -22,7 +22,10 @@ const {
     productsTableDatas,
     employeeGenrates,
     documentsTables,
-    newPermissionsSchemaDef
+    newPermissionsSchemaDef,
+    village,
+    group,
+    center
 } = require('../dbmodels/usables');
 const cryptos = require('../utilities/cryptos');
 const userModels = require('../dbmodels/users');
@@ -1358,7 +1361,6 @@ usableRoutes.post('/create-employee', employeePicsUpload.array('image'), async (
     res.json(cryptos.enableCrypto(req) ? cryptos.encrypt(JSON.stringify(texts)) : texts);
 });
 
-
 usableRoutes.post('/getnewPagePermissionsList', async (req, res) => {
     let texts = { S_CODE: null, S_MSG: "", };
     try {
@@ -1424,6 +1426,176 @@ usableRoutes.post('/create-pagePermissionsList', async (req, res) => {
     res.json(cryptos.enableCrypto(req) ? cryptos.encrypt(JSON.stringify(texts)) : texts);
 });
 
+// village start
+usableRoutes.post('/villagelist', async (req, res) => {
+    let texts = { S_CODE: null, S_MSG: "", };
+    try {
+        let isDrop = cryptos.enableCrypto(req) ? cryptos.decrypt(req.body.secure) : req.body.secure;
+        texts['DATA'] = await village.find({})
+        texts['S_CODE'] = 200;
+        texts['S_MSG'] = "SUCCESS";
+    } catch (e) {
+        texts['S_CODE'] = 400;
+        texts['S_MSG'] = "SERVER ERROR";
+        texts['DATA'] = [];
+    };
+    res.json(cryptos.enableCrypto(req) ? cryptos.encrypt(JSON.stringify(texts)) : texts);
+});
 
+usableRoutes.post('/create-village', async (req, res) => {
+    let texts = { S_CODE: null, S_MSG: "", }
+    try {
+        let villagePayload = cryptos.enableCrypto(req) ? cryptos.decrypt(req.body.secure) : req.body.secure;
+        if (Object.keys(villagePayload).length == 0) {
+            texts['S_CODE'] = 400;
+            texts['S_MSG'] = "No Payload Submitted to Create";
+            texts['DATA'] = [];
+        } else {
+            if (villagePayload.flag == 'S') { // CREATE
+                delete villagePayload.id;
+                let createVillage = await village.create(villagePayload);
+                await createVillage.save();
+                texts['S_CODE'] = 200;
+                texts['S_MSG'] = `SUCCESS`;
+                texts['DATA'] = [];
+            } else if (villagePayload.flag == 'E') {
+                let bEdit = await village.findOne({ _id: villagePayload.id });
+                bEdit.name = villagePayload.name;
+                bEdit.code = villagePayload.code;
+                bEdit.decs = villagePayload.decs;
+                bEdit.active = villagePayload.active;
+                await bEdit.save();
+                texts['S_CODE'] = 200;
+                texts['S_MSG'] = `SUCCESS`;
+                texts['DATA'] = [];
+            }
+            texts['S_CODE'] = 200;
+            texts['S_MSG'] = `${villagePayload.flag == 'E' ? 'Edited' : 'Created'} a Village Successfully`;
+            texts['DATA'] = [];
+        };
+    } catch (e) {
+        // console.log(e)
+        texts['S_CODE'] = 400;
+        texts['S_MSG'] = "SERVER ERROR";
+        texts['DATA'] = [];
+    }
+    res.json(cryptos.enableCrypto(req) ? cryptos.encrypt(JSON.stringify(texts)) : texts);
+});
+// village end
+
+
+// center start
+usableRoutes.post('/centerlist', async (req, res) => {
+    let texts = { S_CODE: null, S_MSG: "", };
+    try {
+        let isDrop = cryptos.enableCrypto(req) ? cryptos.decrypt(req.body.secure) : req.body.secure;
+        texts['DATA'] = await center.find({})
+        texts['S_CODE'] = 200;
+        texts['S_MSG'] = "SUCCESS";
+    } catch (e) {
+        texts['S_CODE'] = 400;
+        texts['S_MSG'] = "SERVER ERROR";
+        texts['DATA'] = [];
+    };
+    res.json(cryptos.enableCrypto(req) ? cryptos.encrypt(JSON.stringify(texts)) : texts);
+});
+
+usableRoutes.post('/create-center', async (req, res) => {
+    let texts = { S_CODE: null, S_MSG: "", }
+    try {
+        let centerPayLoad = cryptos.enableCrypto(req) ? cryptos.decrypt(req.body.secure) : req.body.secure;
+        if (Object.keys(centerPayLoad).length == 0) {
+            texts['S_CODE'] = 400;
+            texts['S_MSG'] = "No Payload Submitted to Create";
+            texts['DATA'] = [];
+        } else {
+            if (centerPayLoad.flag == 'S') { // CREATE
+                delete centerPayLoad.id;
+                let cretaeCenter = await center.create(centerPayLoad);
+                await cretaeCenter.save();
+                texts['S_CODE'] = 200;
+                texts['S_MSG'] = `SUCCESS`;
+                texts['DATA'] = [];
+            } else if (centerPayLoad.flag == 'E') {
+                let bEdit = await center.findOne({ _id: centerPayLoad.id });
+                bEdit.name = centerPayLoad.name;
+                bEdit.code = centerPayLoad.code;
+                bEdit.decs = centerPayLoad.decs;
+                bEdit.active = centerPayLoad.active;
+                await bEdit.save();
+                texts['S_CODE'] = 200;
+                texts['S_MSG'] = `SUCCESS`;
+                texts['DATA'] = [];
+            }
+            texts['S_CODE'] = 200;
+            texts['S_MSG'] = `${centerPayLoad.flag == 'E' ? 'Edited' : 'Created'} a Center Successfully`;
+            texts['DATA'] = [];
+        };
+    } catch (e) {
+        // console.log(e)
+        texts['S_CODE'] = 400;
+        texts['S_MSG'] = "SERVER ERROR";
+        texts['DATA'] = [];
+    }
+    res.json(cryptos.enableCrypto(req) ? cryptos.encrypt(JSON.stringify(texts)) : texts);
+});
+// center end
+
+// group start
+usableRoutes.post('/grouplist', async (req, res) => {
+    let texts = { S_CODE: null, S_MSG: "", };
+    try {
+        let isDrop = cryptos.enableCrypto(req) ? cryptos.decrypt(req.body.secure) : req.body.secure;
+        texts['DATA'] = await group.find({})
+        texts['S_CODE'] = 200;
+        texts['S_MSG'] = "SUCCESS";
+    } catch (e) {
+        texts['S_CODE'] = 400;
+        texts['S_MSG'] = "SERVER ERROR";
+        texts['DATA'] = [];
+    };
+    res.json(cryptos.enableCrypto(req) ? cryptos.encrypt(JSON.stringify(texts)) : texts);
+});
+
+usableRoutes.post('/create-group', async (req, res) => {
+    let texts = { S_CODE: null, S_MSG: "", }
+    try {
+        let groupPayLoad = cryptos.enableCrypto(req) ? cryptos.decrypt(req.body.secure) : req.body.secure;
+        if (Object.keys(groupPayLoad).length == 0) {
+            texts['S_CODE'] = 400;
+            texts['S_MSG'] = "No Payload Submitted to Create";
+            texts['DATA'] = [];
+        } else {
+            if (groupPayLoad.flag == 'S') { // CREATE
+                delete groupPayLoad.id;
+                let createGroup = await group.create(groupPayLoad);
+                await createGroup.save();
+                texts['S_CODE'] = 200;
+                texts['S_MSG'] = `SUCCESS`;
+                texts['DATA'] = [];
+            } else if (groupPayLoad.flag == 'E') {
+                let bEdit = await group.findOne({ _id: groupPayLoad.id });
+                bEdit.name = groupPayLoad.name;
+                bEdit.code = groupPayLoad.code;
+                bEdit.decs = groupPayLoad.decs;
+                bEdit.active = groupPayLoad.active;
+                await bEdit.save();
+                texts['S_CODE'] = 200;
+                texts['S_MSG'] = `SUCCESS`;
+                texts['DATA'] = [];
+            }
+            texts['S_CODE'] = 200;
+            texts['S_MSG'] = `${groupPayLoad.flag == 'E' ? 'Edited' : 'Created'} a Group Successfully`;
+            texts['DATA'] = [];
+        };
+    } catch (e) {
+        // console.log(e)
+        texts['S_CODE'] = 400;
+        texts['S_MSG'] = "SERVER ERROR";
+        texts['DATA'] = [];
+    }
+    res.json(cryptos.enableCrypto(req) ? cryptos.encrypt(JSON.stringify(texts)) : texts);
+});
+// center end
 
 module.exports = usableRoutes;

@@ -749,6 +749,29 @@ const newPermissionsSchema = new Schema({
     modules: [newPageModules]
 });
 
+const modelvillages = new Schema({
+    code: String,
+    name: String,
+    desc: String,
+    ...sameFields
+
+});
+
+const modelcenters = new Schema({
+    code: String,
+    name: String,
+    desc: String,
+    ...sameFields
+
+});
+
+const modelgroups = new Schema({
+    code: String,
+    name: String,
+    desc: String,
+    ...sameFields
+});
+
 const titles = model('title', titleSchema);
 const genders = model('gender', genderSchema);
 const branch = model('smlbranch', branchSchemaNew);
@@ -769,6 +792,9 @@ const productsTableDatas = model('productsTable', productsTable, 'productsTable'
 const documentsTables = model('documentsTable', documentsTable, 'documentsTable');
 const employeeGenrates = model('employeeGenrate', employeeGenrate, 'employeeGenrate');
 const newPermissionsSchemaDef = model('newPermissionsSchema', newPermissionsSchema, 'newPermissionsSchema');
+const modelvillage = model('modelvillage', modelvillages, 'modelvillage');
+const modelcenter = model('modelcenter', modelcenters, 'modelcenter');
+const modelgroup = model('modelgroup', modelgroups, 'modelgroup');
 
 module.exports.CountryModel = CountryModel;
 module.exports.titles = titles;
@@ -790,3 +816,7 @@ module.exports.productsTableDatas = productsTableDatas;
 module.exports.documentsTables = documentsTables;
 module.exports.employeeGenrates = employeeGenrates;
 module.exports.newPermissionsSchemaDef = newPermissionsSchemaDef;
+
+module.exports.village = modelvillage;
+module.exports.center = modelcenter;
+module.exports.group = modelgroup;

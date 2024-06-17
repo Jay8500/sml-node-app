@@ -2,7 +2,9 @@ const express = require('express');
 const usersRoute = express.Router();
 const userModels = require('../dbmodels/users');
 const smlCaders = require('../dbmodels/caders');
-const { genders, createteams } = require('../dbmodels/usables');
+const { genders,
+    employeeGenrates
+} = require('../dbmodels/usables');
 const cryptos = require('../utilities/cryptos');
 const bcrypt = require('bcryptjs');
 const caders = require('../dbmodels/caders');
@@ -182,8 +184,30 @@ usersRoute.post('/teammapper', async (req, res) => {
     res.json(cryptos.enableCrypto(req) ? cryptos.encrypt(JSON.stringify(texts)) : texts);
 });
 
-// default user
+usersRoute.post('/getToCreateUsersEmployeeList', async (req, res) => {
+    let texts = { S_CODE: null, S_MSG: "", };
+    try {
+        let getEmployees = [];
+        let isDrop = cryptos.enableCrypto(req) ? cryptos.decrypt(req.body.secure) : req.body.secure;
+        let getUsers = await userModels.find({ active: true })
+        getEmployees = await employeeGenrates.find({ active: true });
+        // Extract empids from getUsers
+        let userEmpIds = getUsers.map(user => user.empid !== undefined);
+        // Filter employees who don't have empid in userEmpIds
+        let filteredEmployees = getEmployees.filter(employee => userEmpIds.includes(employee._id));
+        texts['DATA'] = filteredEmployees;
+        // };
+        texts['S_CODE'] = 200;
+        texts['S_MSG'] = "SUCCESS";
+    } catch (e) {
+        texts['S_CODE'] = 400;
+        texts['S_MSG'] = "SERVER ERROR";
+        texts['DATA'] = [];
+    };
+    res.json(cryptos.enableCrypto(req) ? cryptos.encrypt(JSON.stringify(texts)) : texts);
+});
 
+// default user
 async function createDevAdminUser() {
     let texts = { S_CODE: null, S_MSG: "", };
     try {
